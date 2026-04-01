@@ -2,6 +2,7 @@ import csv
 from jobspy import scrape_jobs
 from fastapi import APIRouter,Depends
 from router.user import get_current_user
+import json
 
 router = APIRouter(
     tags=["Scraper"]
@@ -17,9 +18,11 @@ async def scrape(role:str,location_of_job:str,country,user:dict = Depends(get_cu
         results_wanted=40,
         hours_old=72,
         country_indeed=country,
+        linkedin_fetch_description=True
         
         # linkedin_fetch_description=True # gets more info such as description, direct job url (slower)
         # proxies=["208.195.175.46:65095", "208.195.175.45:65095", "localhost"],
     )
     
-    return jobs
+    print(len(jobs))
+    return json.loads(jobs.to_json(orient="records",date_format="iso"))

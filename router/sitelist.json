@@ -1,0 +1,36 @@
+{
+  "jobspy_supported": [
+    "indeed",
+    "linkedin",
+    "zip_recruiter",
+    "google",
+    "glassdoor",
+    "bayt",
+    "naukri"
+  ],
+  "nigerian_sites": [
+    "https://www.jobberman.com",
+    "https://www.myjobmag.com",
+    "https://www.hotnigerianjobs.com",
+    "https://www.naijajobportal.com.ng",
+    "https://www.jobzilla.ng",
+    "https://www.nigeriajob.com",
+    "https://www.fuzu.com/nigeria",
+    "https://jobs.delon.ng",
+    "https://www.workinnigeria.com",
+    "https://www.nigerianfinder.com/jobs",
+    "https://afteam.bamboohr.com/careers",
+    "https://flexisaf.zohorecruit.com/jobs/Careers",
+    "https://opportunitydesk.org/",
+    "https://www.interpayments.com/who-we-are/careers/",
+    "https://jobs.apple.com/"
+  ],
+  "global_sites": [
+    "https://www.monster.com",
+    "https://www.simplyhired.com",
+    "https://otta.com",
+    "https://wellfound.com",
+    "https://remoteok.com",
+    "https://weworkremotely.com"
+  ]
+}
