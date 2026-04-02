@@ -1,8 +1,13 @@
 import requests
 from bs4 import BeautifulSoup
+from fastapi import APIRouter
 from dataclasses import dataclass
 
 BASE_URL = "https://www.myjobmag.com"
+
+router = APIRouter(
+    tags=["Jobmag"]
+)
 
 @dataclass
 class JobListing:
@@ -13,8 +18,7 @@ class JobListing:
     job_url: str
     company_url: str
 
-
-def scrape_myjobmag(keyword: str, location: str) -> list[JobListing]:
+async def scrape_myjobmag(keyword: str, location: str) -> list[JobListing]:
     response = requests.get(
         f"{BASE_URL}/search/jobs",
         params={
@@ -54,7 +58,7 @@ def scrape_myjobmag(keyword: str, location: str) -> list[JobListing]:
         date_tag = card.select_one("li#job-date")
         date     = date_tag.get_text(strip=True) if date_tag else None
 
-        if title:  # skip malformed cards
+        if title: 
             listings.append(JobListing(
                 title=title,
                 company=company,
@@ -67,7 +71,3 @@ def scrape_myjobmag(keyword: str, location: str) -> list[JobListing]:
     return listings
 
 
-# Usage
-jobs = scrape_myjobmag("backend developer", "Lagos")
-for job in jobs:
-    print(job)

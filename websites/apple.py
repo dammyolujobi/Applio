@@ -5,6 +5,7 @@ import re
 import json
 BASE_URL = "https://jobs.apple.com"
 
+
 @dataclass
 class JobListing:
     title: str
@@ -20,7 +21,8 @@ headers = {
     "cache-control": "max-age=0",
     "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
 }
-def scrape_apple_jobs(keyword:str,location:str = None):
+
+async def scrape_apple_jobs(keyword:str):
     response = requests.get(f"{BASE_URL}/search",
                             params={"search":keyword},
                             headers=headers,
@@ -43,7 +45,7 @@ def scrape_apple_jobs(keyword:str,location:str = None):
     main_section = data["loaderData"]["search"]["searchResults"]
 
     for section in range(0,len(main_section)):
-        
+
         description = main_section[section]["jobSummary"]
         title = main_section[section]["postingTitle"]
         date = main_section[section]["postingDate"]
@@ -67,7 +69,3 @@ def scrape_apple_jobs(keyword:str,location:str = None):
     return jobs
     
     
-if __name__ == "__main__":
-    results = scrape_apple_jobs("backend")
-    for result in results:
-        print(result)

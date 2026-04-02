@@ -22,7 +22,7 @@ headers = {
     "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
 }
 
-def scrape_jobberman(keyword: str, location: str) -> list[JobListing]:
+async def scrape_jobberman(keyword: str, location: str) -> list[JobListing]:
     response = requests.get(
         f"{BASE_URL}/jobs/{location.lower()}",
         params={"q": keyword},
@@ -67,7 +67,3 @@ def scrape_jobberman(keyword: str, location: str) -> list[JobListing]:
     return jobs
 
 
-if __name__ == "__main__":
-    results = scrape_jobberman("backend developer", "lagos")
-    for job in results:
-        print(job)
