@@ -2,6 +2,7 @@
 __pycache__/
 .venv
 *.pyc
-result.txt
+results.txt
+results.json
 test.py
 constant.py

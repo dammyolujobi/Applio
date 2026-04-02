@@ -1,8 +1,9 @@
 import requests
 from bs4 import BeautifulSoup
 from dataclasses import dataclass
-
-BASE_URL = "https://jobs.apple.com/"
+import re
+import json
+BASE_URL = "https://jobs.apple.com"
 
 @dataclass
 class JobListing:
@@ -25,10 +26,48 @@ def scrape_apple_jobs(keyword:str,location:str = None):
                             headers=headers,
                             timeout=10)
     
+    jobs = []
+
     response.raise_for_status()
     soup = BeautifulSoup(response.text,"html.parser")
+    
+    script_tag = soup.find("script", string= re.compile("__staticRouterHydrationData"))
+    raw = script_tag.string
 
-    with open("result.txt","w",encoding="utf-8") as file:
-        file.write(response.text)
+    json_str = re.search(r'JSON\.parse\("(.+)"\);$', raw, re.DOTALL).group(1)
 
-scrape_apple_jobs("backend")
+    json_str = json_str.encode().decode('unicode_escape')
+
+    data = json.loads(json_str)
+
+    main_section = data["loaderData"]["search"]["searchResults"]
+
+    for section in range(0,len(main_section)):
+        
+        description = main_section[section]["jobSummary"]
+        title = main_section[section]["postingTitle"]
+        date = main_section[section]["postingDate"]
+        id = main_section[section]["id"]
+        transformed_posting_title = main_section[section]["transformedPostingTitle"]
+
+        # team_code = main_section[section]["team"]["teamCode"]
+        job_url = f"https://jobs.apple.com/en-us/details/{id}/{transformed_posting_title}"
+        
+        jobs.append(
+            JobListing(
+                title=title,
+                company="Apple",
+                description=description,
+                date=date,
+                job_url=job_url,
+                company_url="apple.com",
+            )
+        )
+
+    return jobs
+    
+    
+if __name__ == "__main__":
+    results = scrape_apple_jobs("backend")
+    for result in results:
+        print(result)

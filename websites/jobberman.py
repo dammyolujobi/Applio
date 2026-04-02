@@ -38,7 +38,6 @@ def scrape_jobberman(keyword: str, location: str) -> list[JobListing]:
     cards = soup.find_all(attrs={"data-cy": "listing-cards-components"})
 
     for card in cards:
-        # Title + job URL
         title_tag = card.find(attrs={"data-cy": "listing-title-link"})
         title = title_tag.get_text(strip=True) if title_tag else ""
         job_url = title_tag["href"] if title_tag and title_tag.has_attr("href") else ""
@@ -52,7 +51,7 @@ def scrape_jobberman(keyword: str, location: str) -> list[JobListing]:
         desc_tag = card.find("p")  # Usually the first <p> is a snippet
         description = desc_tag.get_text(strip=True) if desc_tag else ""
 
-        # Date posted
+       
         time_tag = card.find("time")
         date = time_tag.get_text(strip=True) if time_tag else ""
 
