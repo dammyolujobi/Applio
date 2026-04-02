@@ -3,6 +3,7 @@ import json
 import re
 from bs4 import BeautifulSoup
 from dataclasses import dataclass
+import re
 
 BASE_URL = "https://www.jobberman.com"
 
@@ -32,28 +33,29 @@ async def scrape_jobberman(keyword: str, location: str) -> list[JobListing]:
     response.raise_for_status()
     soup = BeautifulSoup(response.text, "html.parser")
 
+    with open("results.txt","w",encoding="utf-8") as file:
+                  file.write(response.text)
     jobs = []
 
-
+    
     cards = soup.find_all(attrs={"data-cy": "listing-cards-components"})
-
+    
     for card in cards:
         title_tag = card.find(attrs={"data-cy": "listing-title-link"})
         title = title_tag.get_text(strip=True) if title_tag else ""
         job_url = title_tag["href"] if title_tag and title_tag.has_attr("href") else ""
 
   
-        company_tag = card.find("a", href=lambda h: h and "/company/" in h)
+        company_tag = card.find("p",class_ = "text-sm text-blue-700 text-loading-animate inline-block mt-3")
         company = company_tag.get_text(strip=True) if company_tag else ""
-        company_url = company_tag["href"] if company_tag else ""
 
-        # Short description / snippet
-        desc_tag = card.find("p")  # Usually the first <p> is a snippet
+
+        
+        desc_tag = card.find("p", class_="text-sm font-normal text-gray-700 md:text-gray-500 md:pl-5")
         description = desc_tag.get_text(strip=True) if desc_tag else ""
-
        
-        time_tag = card.find("time")
-        date = time_tag.get_text(strip=True) if time_tag else ""
+        date_tag = card.find("p", class_="text-sm font-normal text-gray-700 text-loading-animate")
+        date = date_tag.get_text(strip=True) if date_tag else ""
 
         jobs.append(JobListing(
             title=title,
@@ -61,9 +63,10 @@ async def scrape_jobberman(keyword: str, location: str) -> list[JobListing]:
             description=description,
             date=date,
             job_url=job_url,
-            company_url=company_url,
+            company_url="",
         ))
 
     return jobs
 
 
+# scrape_jobberman("backend","lagos")

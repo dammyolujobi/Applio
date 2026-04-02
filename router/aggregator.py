@@ -18,7 +18,7 @@ async def aggregate_result(role:str,location_of_job:str,current_user = Depends(g
     jobspy = await scrape(role,location_of_job)
     apple = await scrape_apple_jobs(role)
 
-    combined_result =jobberman + jobmag + jobspy
+    combined_result =jobmag + jobspy + jobberman
 
     return {
         "Jobs In Nigeria":combined_result,

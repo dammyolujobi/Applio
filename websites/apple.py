@@ -23,8 +23,9 @@ headers = {
 }
 
 async def scrape_apple_jobs(keyword:str):
-    response = requests.get(f"{BASE_URL}/search",
-                            params={"search":keyword},
+    response = requests.get(f"{BASE_URL}/en-us/search",
+                            params={"search":keyword,
+                                    "sort":"relevance"},
                             headers=headers,
                             timeout=10)
     
@@ -69,3 +70,4 @@ async def scrape_apple_jobs(keyword:str):
     return jobs
     
     
+# print(scrape_apple_jobs("designer"))
