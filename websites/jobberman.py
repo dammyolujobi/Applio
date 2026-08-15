@@ -1,9 +1,8 @@
 import requests
 import json
-import re
 from bs4 import BeautifulSoup
 from dataclasses import dataclass
-import re
+from typing import List
 
 BASE_URL = "https://www.jobberman.com"
 
@@ -23,50 +22,49 @@ headers = {
     "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
 }
 
-async def scrape_jobberman(keyword: str, location: str) -> list[JobListing]:
-    response = requests.get(
-        f"{BASE_URL}/jobs/{location.lower()}",
-        params={"q": keyword},
-        headers=headers,
-        timeout=10,
-    )
-    response.raise_for_status()
-    soup = BeautifulSoup(response.text, "html.parser")
-
-    with open("results.txt","w",encoding="utf-8") as file:
-                  file.write(response.text)
-    jobs = []
-
-    
-    cards = soup.find_all(attrs={"data-cy": "listing-cards-components"})
-    
-    for card in cards:
-        title_tag = card.find(attrs={"data-cy": "listing-title-link"})
-        title = title_tag.get_text(strip=True) if title_tag else ""
-        job_url = title_tag["href"] if title_tag and title_tag.has_attr("href") else ""
-
-  
-        company_tag = card.find("p",class_ = "text-sm text-blue-700 text-loading-animate inline-block mt-3")
-        company = company_tag.get_text(strip=True) if company_tag else ""
-
-
+async def scrape_jobberman(keyword: str, location: str) -> List[JobListing]:
+    """
+    Scrape jobs from Jobberman with error handling
+    Supports any location (not just Nigerian cities)
+    """
+    try:
+        response = requests.get(
+            f"{BASE_URL}/jobs",
+            params={"q": keyword, "location": location},
+            headers=headers,
+            timeout=15,
+        )
+        response.raise_for_status()
+        soup = BeautifulSoup(response.text, "html.parser")
         
-        desc_tag = card.find("p", class_="text-sm font-normal text-gray-700 md:text-gray-500 md:pl-5")
-        description = desc_tag.get_text(strip=True) if desc_tag else ""
-       
-        date_tag = card.find("p", class_="text-sm font-normal text-gray-700 text-loading-animate")
-        date = date_tag.get_text(strip=True) if date_tag else ""
-
-        jobs.append(JobListing(
-            title=title,
-            company=company,
-            description=description,
-            date=date,
-            job_url=job_url,
-            company_url="",
-        ))
-
-    return jobs
-
-
-# scrape_jobberman("backend","lagos")
+        jobs = []
+        cards = soup.find_all(attrs={"data-cy": "listing-cards-components"})
+        
+        for card in cards:
+            title_tag = card.find(attrs={"data-cy": "listing-title-link"})
+            title = title_tag.get_text(strip=True) if title_tag else ""
+            job_url = title_tag["href"] if title_tag and title_tag.has_attr("href") else ""
+            
+            company_tag = card.find("p", class_="text-sm text-blue-700 text-loading-animate inline-block mt-3")
+            company = company_tag.get_text(strip=True) if company_tag else ""
+            
+            desc_tag = card.find("p", class_="text-sm font-normal text-gray-700 md:text-gray-500 md:pl-5")
+            description = desc_tag.get_text(strip=True) if desc_tag else ""
+            
+            date_tag = card.find("p", class_="text-sm font-normal text-gray-700 text-loading-animate")
+            date = date_tag.get_text(strip=True) if date_tag else ""
+            
+            jobs.append(JobListing(
+                title=title,
+                company=company,
+                description=description,
+                date=date,
+                job_url=job_url if job_url.startswith("http") else f"{BASE_URL}{job_url}",
+                company_url="",
+            ))
+        
+        return jobs
+    
+    except Exception as e:
+        print(f"Error scraping Jobberman: {e}")
+        return []
